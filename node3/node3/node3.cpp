@@ -30,7 +30,7 @@ private:
 class PriorityQueue
 {
 public:
-	void chgPriority(int priority);
+	void chgPriority(int node);
 	void minPrioirty();
 	bool contains(int queue_element);
 	void insert(int queue_element);
@@ -48,6 +48,14 @@ public:
 	void path(int u, int w);
 	int path_size(int u, int w);
 };
+
+void PriorityQueue::chgPriority(int node) {
+	vector<int> temp = x;
+	for (int i = 1; i < SIZE; ++i) {
+		x[i] = temp[i - 1];
+	}
+	x[0] = node;
+}
 
 Graph::Graph(double n, int range)
 {
