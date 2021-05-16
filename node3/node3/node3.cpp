@@ -30,12 +30,14 @@ private:
 class PriorityQueue
 {
 public:
+	PriorityQueue() :x(SIZE) {};
+	void print();
 	void chgPriority(int node);
 	void minPrioirty();
 	bool contains(int queue_element);
-	void insert(int queue_element);
-	int top();
-	int size();
+	void insert(int queue_element) { x.insert(x.begin(), queue_element); };
+	int top() { return x[0]; };
+	int size() { return x.size(); };
 
 private:
 	vector<int> x;
@@ -52,9 +54,30 @@ public:
 void PriorityQueue::chgPriority(int node) {
 	vector<int> temp = x;
 	for (int i = 1; i < SIZE; ++i) {
-		x[i] = temp[i - 1];
+		x[i] = temp.at(i - 1);
 	}
 	x[0] = node;
+}
+
+void PriorityQueue::print() {
+	for (int i = 0; i < SIZE; ++i) {
+		cout << x[i] << ", ";
+	}
+	cout << endl;
+}
+
+void PriorityQueue::minPrioirty() {
+	x.front() = move(x.back());
+	x.pop_back();
+}
+
+bool PriorityQueue::contains(int node) {
+	for (int i = 0; i < SIZE; ++i) {
+		if (x[i] == node) {
+			return true;
+		}
+	}
+	return false;
 }
 
 Graph::Graph(double n, int range)
@@ -220,4 +243,14 @@ int main()
 		cout << "no" << endl;
 
 	a.neighbors(1);
+	cout << endl;
+
+	PriorityQueue q;
+	q.print();
+	for (int i = 0; i < SIZE; ++i) {
+		q.chgPriority(i);
+	}
+	q.print();
+	q.minPrioirty();
+	q.print();
 }
