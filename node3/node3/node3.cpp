@@ -12,6 +12,7 @@ class Graph
 {
 public:
 	Graph(double n, int range);
+	vector<vector<int>> getMatrix(){ return matrix; }
 	int V() { return SIZE * SIZE; };
 	int E() { return (SIZE * (SIZE - 1)) / 2; }
 	bool adjacent(int x, int y);
@@ -27,53 +28,88 @@ private:
 	vector<vector<int>> matrix;
 };
 
+class queue_element{
+public:
+	queue_element(int n = 0, int u = 0) :node(n), cost(u) {}
+	int node;
+	int cost;
+};
+
 class PriorityQueue
 {
 public:
-	PriorityQueue() :x(SIZE) {};
 	void print();
 	void chgPriority(int node);
-	void minPrioirty();
-	bool contains(int queue_element);
-	void insert(int queue_element) { x.insert(x.begin(), queue_element); };
-	int top() { return x[0]; };
+	queue_element minPriority();
+	bool contains(int q);
+	void insert(int q, int c) { x.insert(x.begin(), queue_element(q, c)); };
+	queue_element top() { return x[0]; };
 	int size() { return x.size(); };
 
 private:
-	vector<int> x;
+	vector<queue_element> x;
 };
 
 class ShortestPath
 {
 public:
+	ShortestPath(Graph g) :graph(g) {}
 	void vertices();
 	void path(int u, int w);
 	int path_size(int u, int w);
+private:
+	Graph graph;
+	vector<vector<int>> matrix = graph.getMatrix();
 };
 
-void PriorityQueue::chgPriority(int node) {
-	vector<int> temp = x;
-	for (int i = 1; i < SIZE; ++i) {
-		x[i] = temp.at(i - 1);
+void ShortestPath::path(int u, int w){
+	int old_size = 0, c_size = 0, total_cost = 0;
+	vector<bool> close(SIZE, false);
+	PriorityQueue q;
+	q.insert(u, total_cost);
+	while (q.size() != 0){
+		queue_element temp = q.minPriority();
+		for (int i = 0; i < SIZE; ++i){
+			if (matrix[temp.node][i]){
+				q.insert(i, total_cost + temp.cost);
+			}
+		}
 	}
-	x[0] = node;
 }
 
-void PriorityQueue::print() {
-	for (int i = 0; i < SIZE; ++i) {
-		cout << x[i] << ", ";
+void ShortestPath::vertices(){
+	for (int i = 0; i < SIZE; ++i){
+		graph.neighbors(i);
+		cout << endl;
 	}
 	cout << endl;
 }
 
-void PriorityQueue::minPrioirty() {
-	x.front() = move(x.back());
-	x.pop_back();
+void PriorityQueue::chgPriority(int n) {
+	vector<queue_element> temp = x;
+	for (int i = 1; i < x.size(); ++i) {
+		x[i] = temp.at(i - 1);
+	}
+	x[0].node = n;
 }
 
-bool PriorityQueue::contains(int node) {
-	for (int i = 0; i < SIZE; ++i) {
-		if (x[i] == node) {
+void PriorityQueue::print() {
+	for (int i = 0; i < x.size(); ++i) {
+		cout << x[i].node << ", ";
+	}
+	cout << endl;
+}
+
+queue_element PriorityQueue::minPriority() {
+	queue_element temp = x.front();
+	x.front() = move(x.back());
+	x.pop_back();
+	return temp;
+}
+
+bool PriorityQueue::contains(int n) {
+	for (int i = 0; i < x.size(); ++i) {
+		if (x[i].node == n) {
 			return true;
 		}
 	}
@@ -234,23 +270,28 @@ bool Graph::is_connected()
 int main()
 {
 	srand(time(0));
-	Graph a(0.3, 5);
+	Graph a(0.1, 5);
 	a.print();
 
-	if (a.adjacent(0, 3))
-		cout << "yes" << endl;
-	else
-		cout << "no" << endl;
+	// if (a.adjacent(0, 3))
+		// cout << "yes" << endl;
+	// else
+		// cout << "no" << endl;
 
-	a.neighbors(1);
+	// a.neighbors(1);
+	// cout << endl;
+
+	// PriorityQueue q;
+	// q.print();
+	// for (int i = 0; i < SIZE; ++i) {
+		// q.chgPriority(i);
+	// }
+	// q.print();
+	// q.minPrioirty();
+	// q.print();
+	
 	cout << endl;
-
-	PriorityQueue q;
-	q.print();
-	for (int i = 0; i < SIZE; ++i) {
-		q.chgPriority(i);
-	}
-	q.print();
-	q.minPrioirty();
-	q.print();
+	ShortestPath d(a);
+	d.vertices();
+	d.path(0, 1);
 }
