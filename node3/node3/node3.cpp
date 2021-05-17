@@ -7,7 +7,11 @@
 
 using namespace std;
 
+// Set the size of the graph
+
 const int SIZE = 50;
+
+// Return random probability
 
 inline double prob() { return (rand() % 100) / 100.0; }
 
@@ -395,6 +399,8 @@ bool Graph::is_connected()
 int main()
 {
 	srand(time(0));
+	
+	// 0.2 represent the 20% density while 10 is the distance range
 	Graph a(0.2, 10), b(0.4, 10);
 
 	// if (a.adjacent(0, 3))
