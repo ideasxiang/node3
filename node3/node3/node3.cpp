@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const int SIZE = 6;
+const int SIZE = 50;
 
 inline double prob() { return (rand() % 100) / 100.0; }
 
@@ -46,7 +46,7 @@ public:
 	queue_element minPriority();
 	queue_element contains(int q);
 	void insert(int q, int c) { x.insert(x.begin(), queue_element(q, c)); };
-	queue_element top() { return x[0]; };
+	queue_element* top() { return &x[0]; };
 	int size() { return x.size(); };
 
 private:
@@ -72,31 +72,33 @@ void ShortestPath::path(int u, int w) {
 	open[u] = true;
 	PriorityQueue q;
 	q.insert(u, 0);
-	q.top().insert(u);
+	q.top()->insert(u);
 	while (c_size < SIZE) {
-		queue_element temp = q.minPriority();
+		queue_element temp;
+		if (q.size() != 0)
+			temp = q.minPriority();
+		else {
+			cout << "No path found" << endl;
+			return;
+		}
 		for (int i = 0; i < SIZE; ++i) {
 			old_size = c_size;
 			if (open[i] && close[i] == false) {
 				close[i] = true;
 				c_size++;
 			}
-			for (int j = 0; j < SIZE; ++j) {
-				if (open[i]) {
-					open[j] = open[j] || matrix[i][j];
-				}
-			}
 			if (matrix[temp.node][i] && close[i] == false) {
-				cout << "Path: " << temp.node << ", " << i << endl;
+				open[i] = true;
+				//cout << "Path: " << temp.node << ", " << i << endl;
 				q.insert(i, temp.cost + matrix[temp.node][i]);
-				queue_element top = q.top();
+				queue_element* top = q.top();
+				top->insert(i);
 				for (int j = 0; j < temp.past.size(); ++j) {
-					top.past.push_back(temp.past[j]);
+					top->insert(temp.past[j]);
 				}
 			}
 		}
 		if (q.contains(w).cost) {
-			cout << "Cost is " << q.contains(w).cost << endl;
 			cout << "Path is ";
 			for (int i = 0; i < q.contains(w).past.size(); ++i) {
 				cout << q.contains(w).past[i] << ", ";
@@ -104,9 +106,39 @@ void ShortestPath::path(int u, int w) {
 			cout << endl;
 			return;
 		}
-		if (old_size == c_size)
-			cout << "Failed" << endl;
-			return;
+	}
+}
+
+int ShortestPath::path_size(int u, int w) {
+	int old_size = 0, c_size = 0;
+	vector<bool> close(SIZE, false);
+	vector<bool> open(SIZE, false);
+	open[u] = true;
+	PriorityQueue q;
+	q.insert(u, 0);
+	q.top()->insert(u);
+	while (c_size < SIZE) {
+		queue_element temp;
+		if (q.size() != 0)
+			temp = q.minPriority();
+		else {
+			return 0;
+		}
+		for (int i = 0; i < SIZE; ++i) {
+			old_size = c_size;
+			if (open[i] && close[i] == false) {
+				close[i] = true;
+				c_size++;
+			}
+			if (matrix[temp.node][i] && close[i] == false) {
+				open[i] = true;
+				//cout << "Path: " << temp.node << ", " << i << endl;
+				q.insert(i, temp.cost + matrix[temp.node][i]);
+			}
+		}
+		if (q.contains(w).cost) {
+			return q.contains(w).cost;
+		}
 	}
 }
 
@@ -315,8 +347,7 @@ bool Graph::is_connected()
 int main()
 {
 	srand(time(0));
-	Graph a(0.3, 5);
-	a.print();
+	Graph a(0.2, 10), b(0.4, 10);
 
 	// if (a.adjacent(0, 3))
 		// cout << "yes" << endl;
@@ -335,8 +366,30 @@ int main()
 	// q.minPrioirty();
 	// q.print();
 
-	cout << endl;
-	ShortestPath d(a);
-	d.vertices();
-	d.path(0, 1);
+	ShortestPath d(a), e(b);
+	cout << "Cost when Density at 20%:" << endl;
+	int sum = 0;
+	double total = 50;
+	for (int i = 0; i < 50; ++i) {
+		int cost = d.path_size(0, i);
+		if (cost)
+			sum += cost;
+		else
+			total -= 1;
+			
+	}
+	cout << sum / total << endl;
+
+	cout << "Cost when Density at 40%:" << endl;
+	sum = 0;
+	total = 50;
+	for (int i = 0; i < 50; ++i) {
+		int cost = e.path_size(0, i);
+		if (cost)
+			sum += cost;
+		else
+			total -= 1;
+
+	}
+	cout << sum / total << endl;
 }
