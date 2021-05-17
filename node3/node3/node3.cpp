@@ -1,3 +1,6 @@
+// Created on 17 May 2021
+// Shortest Path algorith or Dijkstra Algorithm
+
 #include <iostream>
 #include <vector>
 #include <time.h>
@@ -7,6 +10,8 @@ using namespace std;
 const int SIZE = 50;
 
 inline double prob() { return (rand() % 100) / 100.0; }
+
+// Graph using matrix representation
 
 class Graph
 {
@@ -28,6 +33,8 @@ private:
 	vector<vector<int>> matrix;
 };
 
+// Queue element for storing total cost and the path taken
+
 class queue_element {
 public:
 	queue_element(int n = 0, int u = 0) :node(n), cost(u) {}
@@ -37,6 +44,8 @@ public:
 	int cost;
 	vector<int> past;
 };
+
+// Queue to store the queue element
 
 class PriorityQueue
 {
@@ -53,6 +62,8 @@ private:
 	vector<queue_element> x;
 };
 
+// Functions to calculate the shortest path
+
 class ShortestPath
 {
 public:
@@ -64,6 +75,8 @@ private:
 	Graph graph;
 	vector<vector<int>> matrix = graph.getMatrix();
 };
+
+// Calculate and return shortest path
 
 void ShortestPath::path(int u, int w) {
 	int old_size = 0, c_size = 0;
@@ -109,6 +122,8 @@ void ShortestPath::path(int u, int w) {
 	}
 }
 
+// Calculate and return shortest path cost
+
 int ShortestPath::path_size(int u, int w) {
 	int old_size = 0, c_size = 0;
 	vector<bool> close(SIZE, false);
@@ -142,6 +157,8 @@ int ShortestPath::path_size(int u, int w) {
 	}
 }
 
+// Show all connected edges
+
 void ShortestPath::vertices() {
 	for (int i = 0; i < SIZE; ++i) {
 		graph.neighbors(i);
@@ -149,6 +166,8 @@ void ShortestPath::vertices() {
 	}
 	cout << endl;
 }
+
+// Change the top element of the vector
 
 void PriorityQueue::chgPriority(int n) {
 	vector<queue_element> temp = x;
@@ -158,6 +177,8 @@ void PriorityQueue::chgPriority(int n) {
 	x[0].node = n;
 }
 
+// Print all the nodes
+
 void PriorityQueue::print() {
 	for (int i = 0; i < x.size(); ++i) {
 		cout << x[i].node << ", ";
@@ -165,12 +186,25 @@ void PriorityQueue::print() {
 	cout << endl;
 }
 
+// Returns the element with the least cost
+
 queue_element PriorityQueue::minPriority() {
-	queue_element temp = x.front();
-	x.front() = move(x.back());
-	x.pop_back();
-	return temp;
+	int min = 10000;
+	for (int i = 0; i < x.size(); ++i) {
+		if (x[i].cost < min)
+			min = x[i].cost;
+	}
+	for (int i = 0; i < x.size(); ++i) {
+		if (x[i].cost == min) {
+			queue_element temp = x[i];
+			x.erase(x.begin() + i);
+			return temp;
+		}
+			
+	}
 }
+
+// Returns the element if the Queue contains the element else return default
 
 queue_element PriorityQueue::contains(int n) {
 	queue_element temp;
@@ -182,6 +216,8 @@ queue_element PriorityQueue::contains(int n) {
 	return temp;
 }
 
+// Return the number of connected edges
+
 int Graph::E() {
 	int edges = 0;
 	for (int i = 0; i < SIZE; ++i) {
@@ -192,6 +228,8 @@ int Graph::E() {
 	}
 	return edges;
 }
+
+// Creates a default graph according to the density and the range
 
 Graph::Graph(double n, int range)
 {
@@ -222,6 +260,8 @@ Graph::Graph(double n, int range)
 		}
 	}
 }
+
+// Checks if two nodes are connected
 
 bool Graph::adjacent(int x, int y)
 {
@@ -259,6 +299,8 @@ bool Graph::adjacent(int x, int y)
 	}
 }
 
+// Show where each node can go
+
 void Graph::neighbors(int x) {
 	int old_size = 0, c_size = 0;
 	vector<bool> close(SIZE);
@@ -294,12 +336,14 @@ void Graph::neighbors(int x) {
 	cout << endl;
 }
 
+// Add a connected edge between two nodes
+
 void Graph::add(int x, int y) {
 	if (!matrix[x][y])
 		matrix[x][y] = matrix[y][x] = 1;
 }
 
-
+// Prints the graph
 
 void Graph::print()
 {
@@ -312,6 +356,8 @@ void Graph::print()
 		cout << endl;
 	}
 }
+
+// Check if all the nodes in the graph are connected
 
 bool Graph::is_connected()
 {
@@ -343,6 +389,8 @@ bool Graph::is_connected()
 			return false;
 	}
 }
+
+// Create two densities 20% and 40% graph and calculate the average shortest path
 
 int main()
 {
