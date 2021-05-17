@@ -12,7 +12,7 @@ class Graph
 {
 public:
 	Graph(double n, int range);
-	vector<vector<int>> getMatrix(){ return matrix; }
+	vector<vector<int>> getMatrix() { return matrix; }
 	int V() { return SIZE * SIZE; };
 	int E() { return (SIZE * (SIZE - 1)) / 2; }
 	bool adjacent(int x, int y);
@@ -28,7 +28,7 @@ private:
 	vector<vector<int>> matrix;
 };
 
-class queue_element{
+class queue_element {
 public:
 	queue_element(int n = 0, int u = 0) :node(n), cost(u) {}
 	int node;
@@ -62,23 +62,23 @@ private:
 	vector<vector<int>> matrix = graph.getMatrix();
 };
 
-void ShortestPath::path(int u, int w){
+void ShortestPath::path(int u, int w) {
 	int old_size = 0, c_size = 0, total_cost = 0;
 	vector<bool> close(SIZE, false);
 	PriorityQueue q;
 	q.insert(u, total_cost);
-	while (q.size() != 0){
+	while (q.size() != 0) {
 		queue_element temp = q.minPriority();
-		for (int i = 0; i < SIZE; ++i){
-			if (matrix[temp.node][i]){
+		for (int i = 0; i < SIZE; ++i) {
+			if (matrix[temp.node][i]) {
 				q.insert(i, total_cost + temp.cost);
 			}
 		}
 	}
 }
 
-void ShortestPath::vertices(){
-	for (int i = 0; i < SIZE; ++i){
+void ShortestPath::vertices() {
+	for (int i = 0; i < SIZE; ++i) {
 		graph.neighbors(i);
 		cout << endl;
 	}
@@ -289,7 +289,7 @@ int main()
 	// q.print();
 	// q.minPrioirty();
 	// q.print();
-	
+
 	cout << endl;
 	ShortestPath d(a);
 	d.vertices();
