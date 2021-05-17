@@ -14,7 +14,7 @@ public:
 	Graph(double n, int range);
 	vector<vector<int>> getMatrix() { return matrix; }
 	int V() { return SIZE * SIZE; };
-	int E() { return (SIZE * (SIZE - 1)) / 2; }
+	int E();
 	bool adjacent(int x, int y);
 	void neighbors(int x);
 	void add(int x, int y);
@@ -31,8 +31,11 @@ private:
 class queue_element {
 public:
 	queue_element(int n = 0, int u = 0) :node(n), cost(u) {}
+	int size() { return past.size(); }
+	void insert(int u) { past.push_back(u); }
 	int node;
 	int cost;
+	vector<int> past;
 };
 
 class PriorityQueue
@@ -41,7 +44,7 @@ public:
 	void print();
 	void chgPriority(int node);
 	queue_element minPriority();
-	bool contains(int q);
+	queue_element contains(int q);
 	void insert(int q, int c) { x.insert(x.begin(), queue_element(q, c)); };
 	queue_element top() { return x[0]; };
 	int size() { return x.size(); };
@@ -63,17 +66,47 @@ private:
 };
 
 void ShortestPath::path(int u, int w) {
-	int old_size = 0, c_size = 0, total_cost = 0;
+	int old_size = 0, c_size = 0;
 	vector<bool> close(SIZE, false);
+	vector<bool> open(SIZE, false);
+	open[u] = true;
 	PriorityQueue q;
-	q.insert(u, total_cost);
-	while (q.size() != 0) {
+	q.insert(u, 0);
+	q.top().insert(u);
+	while (c_size < SIZE) {
 		queue_element temp = q.minPriority();
 		for (int i = 0; i < SIZE; ++i) {
-			if (matrix[temp.node][i]) {
-				q.insert(i, total_cost + temp.cost);
+			old_size = c_size;
+			if (open[i] && close[i] == false) {
+				close[i] = true;
+				c_size++;
+			}
+			for (int j = 0; j < SIZE; ++j) {
+				if (open[i]) {
+					open[j] = open[j] || matrix[i][j];
+				}
+			}
+			if (matrix[temp.node][i] && close[i] == false) {
+				cout << "Path: " << temp.node << ", " << i << endl;
+				q.insert(i, temp.cost + matrix[temp.node][i]);
+				queue_element top = q.top();
+				for (int j = 0; j < temp.past.size(); ++j) {
+					top.past.push_back(temp.past[j]);
+				}
 			}
 		}
+		if (q.contains(w).cost) {
+			cout << "Cost is " << q.contains(w).cost << endl;
+			cout << "Path is ";
+			for (int i = 0; i < q.contains(w).past.size(); ++i) {
+				cout << q.contains(w).past[i] << ", ";
+			}
+			cout << endl;
+			return;
+		}
+		if (old_size == c_size)
+			cout << "Failed" << endl;
+			return;
 	}
 }
 
@@ -107,13 +140,25 @@ queue_element PriorityQueue::minPriority() {
 	return temp;
 }
 
-bool PriorityQueue::contains(int n) {
+queue_element PriorityQueue::contains(int n) {
+	queue_element temp;
 	for (int i = 0; i < x.size(); ++i) {
 		if (x[i].node == n) {
-			return true;
+			return x[i];
 		}
 	}
-	return false;
+	return temp;
+}
+
+int Graph::E() {
+	int edges = 0;
+	for (int i = 0; i < SIZE; ++i) {
+		for (int j = 0; j < SIZE; ++j) {
+			if (matrix[i][j])
+				edges++;
+		}
+	}
+	return edges;
 }
 
 Graph::Graph(double n, int range)
@@ -270,7 +315,7 @@ bool Graph::is_connected()
 int main()
 {
 	srand(time(0));
-	Graph a(0.1, 5);
+	Graph a(0.3, 5);
 	a.print();
 
 	// if (a.adjacent(0, 3))
